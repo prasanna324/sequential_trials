@@ -47,8 +47,8 @@ K <- 24
 # Import long format data file with covariate and outcome data
 med_obs <- read_feather(sprintf("ETT/PPI/Processed_files/PPI_longdata_GI_%s.ft", event_name))
 
-med_obs$id <- med_obs$Lopnr
-length(unique(med_obs$Lopnr))
+med_obs$id <- med_obs$Pid
+length(unique(med_obs$Pid))
 
 # Set eligibility and encounter dates based on censoring time for HU
 med_obs$elig <- med_obs$elig_gi12
@@ -69,7 +69,7 @@ med_obs$ind_PPI_con[is.na(med_obs$ind_PPI_con)] <- 0
 # Create a replicate of encounter date but with no NAs. This will be used for computing time since last HU
 # Fill NAs in encounter_date column with the last available non-NA value
 med_obs <- med_obs %>%
-  group_by(Lopnr) %>%
+  group_by(Pid) %>%
   mutate(enc_date_nomiss = zoo::na.locf(encounter_date))
 
 # Calculate time difference in months between current_date and encounter_date
@@ -174,7 +174,7 @@ med_obs$N.drugs_cat_sb <- as.factor(med_obs$N.drugs_cat_sb)
 
 ### Create a variable for cumulative of treatment variable
 med_obs <- med_obs %>%
-  group_by(Lopnr) %>%
+  group_by(Pid) %>%
   mutate(treat_cum = cumsum(treat)) %>%
   ungroup()
 
@@ -448,7 +448,7 @@ med_elig$N.drugs_cat_b <- as.factor(med_elig$N.drugs_cat_b)
 
 # Define categorical columns
 
-selected_columns_obs <- c("Lopnr", "dataset", "time_lastHU", "current_date", "treat", 
+selected_columns_obs <- c("Pid", "dataset", "time_lastHU", "current_date", "treat", 
                           "eventMC", "timeMC", "cal_time", "cal_timesqr", "Year", "Year_cat",
                           "Age", "Sex", "ind_PPI", "ind_PPI_sb", "N.GI", "N.endo", "N.drugs", 
                           "N.visits", "N.GI_sb", "N.endo_sb", "N.drugs_sb", "N.visits_sb", 
@@ -463,7 +463,7 @@ categorical_columns_obs <- c("censor_hu",
                              "N.endo_cat_sb", "N.GI_cat_sb", "N.visits_cat_sb",
                              "N.drugs_cat_sb", "CCIW_cat_sb", "ind_PPI_sb")
 
-selected_columns_elig <- c("id", "trial_num", "Lopnr", "dataset", "time_lastHU", "id_new", 
+selected_columns_elig <- c("id", "trial_num", "Pid", "dataset", "time_lastHU", "id_new", 
                            "censor_hu", "treat", "censor", "eventMC", "timeMC",  "Year", "Year_cat",
                            "cal_time", "cal_timesqr", "Age", "Sex", "ind_PPI", "ind_PPI_sb", "N.GI", 
                            "N.endo", "N.drugs", "N.visits", "N.GI_sb", "N.endo_sb", "N.drugs_sb", 

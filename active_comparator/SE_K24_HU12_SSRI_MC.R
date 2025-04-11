@@ -36,8 +36,8 @@ K <- 24
 
 # Import long format data file with covariate and outcome data
 med_obs <- read_feather(paste0('ETT/SSRI/Processed_files/SSRI_longdata_', event_name,'.ft'))
-med_obs$id <- med_obs$Lopnr
-length(unique(med_obs$Lopnr))
+med_obs$id <- med_obs$Pid
+length(unique(med_obs$Pid))
 
 # Set eligibility and encounter dates based on censoring time for HU
 med_obs$elig <- med_obs$elig12
@@ -57,8 +57,8 @@ med_obs$ind_SSRI_con[is.na(med_obs$ind_SSRI_con)] <- 0
 
 # Baseline indication time
 med_obs <- med_obs %>%
-  arrange(Lopnr, cal_time) %>%
-  group_by(Lopnr) %>%
+  arrange(Pid, cal_time) %>%
+  group_by(Pid) %>%
   mutate(ind_SSRI_con_sb = if_else(cal_time == 0, ind_SSRI_con, NA_integer_)) %>%
   fill(ind_SSRI_con_sb, .direction = "down") %>%
   ungroup()
@@ -66,7 +66,7 @@ med_obs <- med_obs %>%
 # Create a replicate of encounter date but with no NAs. This will be used for computing time since last HU
 # Fill NAs in encounter_date column with the last available non-NA value
 med_obs <- med_obs %>%
-  group_by(Lopnr) %>%
+  group_by(Pid) %>%
   mutate(enc_date_nomiss = zoo::na.locf(encounter_date))
 
 # Calculate time difference in months between current_date and encounter_date
